@@ -25,8 +25,28 @@ app.post("/", async (req, res) => {
   try {
     const prompt = req.body.prompt;
 
+    //Higher temperature means more risk 0.7 was default
+    //max_tokens is maximum number of tokens to generate in a completion 256 was default
+    //frequency_penalty won't repeat similar sentences often
     const response = await openai.createCompletion({
-      prompt,
+      model: "text-davinci-003",
+      prompt: `${prompt}`,
+      temperature: 0,
+      max_tokens: 3000,
+      top_p: 1,
+      frequency_penalty: 0.5,
+      presence_penalty: 0,
     });
-  } catch (error) {}
+
+    res.status(200).send({
+      bot: response.data.choices[0].text,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).send({ error });
+  }
 });
+
+app.listen(5000, () =>
+  console.log("Server is running on port http://localhost:5000")
+);
